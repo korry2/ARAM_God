@@ -1,0 +1,45 @@
+name: Gece Bekçisi (Günlük Kontrol)
+
+# Bu robot ne zaman çalışsın?
+# 1. Her gece saat 04:00'te (cron zamanlaması)
+# 2. Ayrıca biz istersek manuel olarak da çalıştırabilelim (workflow_dispatch)
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  daily-health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Python Kuruluyor
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    - name: Kütüphaneler Yükleniyor
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    # Gizli anahtarı kasadan alıp config.py yapıyoruz
+    - name: Config Dosyası Oluşturuluyor
+      env:
+        GIZLI_ANAHTAR: ${{ secrets.RIOT_API_KEY }}
+      run: |
+        echo "api_key = '$GIZLI_ANAHTAR'" > config.py
+
+    # Verileri sıfırdan indirip deniyoruz (Bakalım Riot formatı değiştirdi mi?)
+    - name: Veri İndirme Testi
+      run: python data_manager.py
+
+    # Analiz motorunu test ediyoruz
+    - name: Analiz Motoru Testi
+      run: python team_analyzer.py
+
+    # Savaş danışmanını test ediyoruz
+    - name: Savaş Danışmanı Testi
+      run: python smart_advisor.py
