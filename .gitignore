@@ -1,0 +1,9 @@
+# --- GÜVENLİK (BUNLAR ASLA YÜKLENMEMELİ) ---
+config.py
+
+# --- GEREKSİZ DOSYALAR ---
+__pycache__/
+*.spec
+
+# --- İNDİRİLEN VERİLER (Bunları zaten kodla indiriyoruz, yüklemeye gerek yok) ---
+data/
