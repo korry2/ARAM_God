@@ -55,6 +55,19 @@ class ChampionLibrary:
             }
         else:
             return None
+        
+    def get_champion_by_id(self, champ_id):
+        """Verilen ID numarasının (örn: 222) hangi şampiyon olduğunu bulur."""
+        # ID string gelebilir, integer'a çevirelim
+        try:
+            champ_id = int(champ_id)
+        except:
+            return None
+
+        for key, val in self.champions.items():
+            if int(val["key"]) == champ_id:
+                return val["name"]
+        return None
 
 # --- TEST ALANI ---
 # Bu dosya doğrudan çalıştırıldığında burası devreye girer.
