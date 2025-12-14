@@ -1,0 +1,45 @@
+name: ARAM God Otomasyonu
+
+# Bu otomasyon ne zaman çalışsın?
+# Ana dala (main) her 'push' yapıldığında.
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    # Robotun kullanacağı işletim sistemi (Ubuntu Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Adım: Kodları GitHub deposundan sanal makineye çek
+    - uses: actions/checkout@v4
+
+    # 2. Adım: Python Kurulumu
+    - name: Python Kuruluyor
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    # 3. Adım: Gerekli Kütüphaneleri Yükle
+    - name: Kütüphaneler Yükleniyor
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    # 4. Adım: Gizli Anahtarı Kullanarak config.py Oluştur
+    # Burası sihrin gerçekleştiği yer. Senin 'Secret' olarak kaydettiğin anahtarı alıp
+    # sanal makinede config.py dosyasının içine yazıyor.
+    - name: Config Dosyası Oluşturuluyor
+      env:
+        GIZLI_ANAHTAR: ${{ secrets.RIOT_API_KEY }}
+      run: |
+        echo "api_key = '$GIZLI_ANAHTAR'" > config.py
+
+    # 5. Adım: Verileri İndir (Test)
+    - name: Veri İndirme Testi
+      run: python data_manager.py
+
+    # 6. Adım: Kütüphane Testi
+    - name: Kütüphane Okuma Testi
+      run: python lol_library.py
