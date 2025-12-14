@@ -4,7 +4,7 @@ import requests
 import urllib3
 import json
 
-# Güvenlik sertifikası uyarılarını sustur (LoL yerel sunucusu sertifikasızdır)
+# Güvenlik sertifikası uyarılarını sustur
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class LCUConnector:
@@ -23,8 +23,6 @@ class LCUConnector:
             try:
                 if proc.info['name'] == self.process_name:
                     args = proc.info['cmdline']
-                    
-                    # Şifre ve Port bilgilerini argümanlardan ayıkla
                     for arg in args:
                         if arg.startswith('--remoting-auth-token='):
                             self.auth_token = arg.split('=')[1]
@@ -32,11 +30,9 @@ class LCUConnector:
                             self.port = arg.split('=')[1]
                     
                     if self.auth_token and self.port:
-                        # Bağlantı URL'sini ve Başlıkları hazırla
                         self.base_url = f"https://127.0.0.1:{self.port}"
                         auth_str = f"riot:{self.auth_token}"
                         auth_b64 = base64.b64encode(auth_str.encode()).decode()
-                        
                         self.headers = {
                             "Authorization": f"Basic {auth_b64}",
                             "Accept": "application/json"
@@ -57,23 +53,15 @@ class LCUConnector:
         url = f"{self.base_url}/lol-champ-select/v1/session"
         try:
             response = requests.get(url, headers=self.headers, verify=False)
+            
             if response.status_code == 200:
                 return response.json()
             else:
-                # Eğer 404 dönerse, şampiyon seçim ekranında değilsin demektir.
+                # BURASI YENİ: Hata kodunu ekrana basıyoruz
+                print(f"DEBUG: API Hatası. Kod: {response.status_code}")
+                if response.status_code == 404:
+                    print("--> (404 Demek: Şu an şampiyon seçim ekranında değilsin demek.)")
                 return None
-        except:
+        except Exception as e:
+            print(f"DEBUG: Bağlantı hatası: {e}")
             return None
-
-# --- TEST ALANI ---
-if __name__ == "__main__":
-    connector = LCUConnector()
-    if connector.connect():
-        print("\nVeri çekiliyor...")
-        data = connector.get_champ_select_data()
-        if data:
-            print("Şampiyon Seçim Ekranı Aktif!")
-            # Ham veriyi görelim (Test amaçlı)
-            print(json.dumps(data, indent=4)[:500] + "...") 
-        else:
-            print("Şu an şampiyon seçim ekranında değilsin.")
