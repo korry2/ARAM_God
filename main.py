@@ -1,36 +1,43 @@
 import sys
 from team_analyzer import TeamAnalyzer
-from stat_calculator import StatCalculator
+from smart_advisor import SmartAdvisor
 
 def main():
     print("==================================================")
-    print("          ARAM GOD - SAVAŞ ASİSTANI v1.0          ")
+    print("          ARAM GOD - SAVAŞ ASİSTANI v1.1          ")
     print("==================================================")
     
-    # Araçları hazırlıyoruz
     analyzer = TeamAnalyzer()
-    # StatCalculator'ı şimdilik bekletiyoruz, ileride buraya ekleyeceğiz.
+    advisor = SmartAdvisor()
     
     while True:
         print("\n[MENÜ]")
-        print("1. Takım Analizi Yap (Şampiyon Seçim Ekranı)")
+        print("1. Tam Maç Analizi (Bizim Takım vs Rakip Takım)")
         print("2. Çıkış")
         
         secim = input("\nSeçimin nedir (1-2): ")
         
         if secim == "1":
-            print("\nTakımdaki 5 şampiyonun ismini aralarına virgül koyarak yaz.")
-            print("Örnek: Malphite, Yasuo, Lulu, Jinx, Zed")
-            user_input = input("Şampiyonlar: ")
+            # 1. BİZİM TAKIM
+            print("\n--- ADIM 1: BİZİM TAKIM ---")
+            print("Takımındaki şampiyonları virgülle ayırarak yaz.")
+            my_team_input = input("Bizimkiler: ")
+            my_team = [x.strip() for x in my_team_input.split(",")]
             
-            # Girilen metni virgülden bölüp temizliyoruz
-            champ_list = [x.strip() for x in user_input.split(",")]
+            if len(my_team) < 5:
+                print("Bilgi: Eksik şampiyon girdin ama devam ediyorum.")
+
+            # Bizim takımın analizi
+            analyzer.analyze_team(my_team)
             
-            if len(champ_list) < 5:
-                print("UYARI: 5 şampiyon girmedin ama yine de analiz yapıyorum...")
+            # 2. RAKİP TAKIM
+            print("\n--- ADIM 2: RAKİP TAKIM ---")
+            print("Rakip şampiyonları virgülle ayırarak yaz.")
+            enemy_team_input = input("Rakipler: ")
+            enemy_team = [x.strip() for x in enemy_team_input.split(",")]
             
-            # Analizi başlat
-            analyzer.analyze_team(champ_list)
+            # Danışman devreye giriyor
+            advisor.advise(enemy_team)
             
             input("\nAna menüye dönmek için Enter'a bas...")
             
